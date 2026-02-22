@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meme por Gestos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>📷 Meme por Gestos</h1>
+    <p class="subtitle">Cara séria = Meme 1 · Mão na boca = Meme 2</p>
+
+    <div class="setup-section">
+      <div class="upload-group">
+        <label for="meme-seria">Imagem para <strong>cara séria</strong>:</label>
+        <input type="file" id="meme-seria" accept="image/*">
+      </div>
+      <div class="upload-group">
+        <label for="meme-mao">Imagem para <strong>mão na boca</strong>:</label>
+        <input type="file" id="meme-mao" accept="image/*">
+      </div>
+    </div>
+
+    <div class="camera-area">
+      <div class="video-wrapper">
+        <video id="webcam" autoplay playsinline></video>
+        <canvas id="overlay"></canvas>
+        <div id="meme-display" class="meme-overlay hidden">
+          <img id="meme-image" src="" alt="Meme">
+          <span id="meme-label" class="meme-label"></span>
+        </div>
+      </div>
+      <div class="status" id="status">Carregando câmera...</div>
+    </div>
+
+    <div class="controls">
+      <button id="btn-start">Iniciar câmera</button>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
