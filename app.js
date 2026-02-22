@@ -11,6 +11,7 @@ const memeLabel = document.getElementById('meme-label');
 const statusEl = document.getElementById('status');
 const btnStart = document.getElementById('btn-start');
 const inputMemeSeria = document.getElementById('meme-seria');
+const inputMemeSorriso = document.getElementById('meme-sorriso');
 const inputMemeMao = document.getElementById('meme-mao');
 
 let faceLandmarker = null;
@@ -19,6 +20,7 @@ let lastVideoTime = -1;
 let animationId = null;
 let stream = null;
 let memeSeriaUrl = 'img/serio.jpeg';
+let memeSorrisoUrl = 'img/sorrindo.jpg';
 let memeMaoUrl = 'img/mao-na-boca.jpeg';
 
 // Índices da boca no Face Landmarker (478 landmarks)
@@ -28,6 +30,7 @@ const MOUTH_CENTER_TOP = 13;
 const MOUTH_CENTER_BOTTOM = 14;
 
 const SMILE_THRESHOLD = 0.25;
+const SMILE_HAPPY_THRESHOLD = 0.35;
 const HAND_NEAR_MOUTH_DIST = 0.22;
 const BROW_DOWN_THRESHOLD = 0.3;
 const MOUTH_FROWN_THRESHOLD = 0.3;
@@ -63,9 +66,36 @@ function distance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
+function getFaceBox(landmarks) {
+  let minX = 1;
+  let maxX = 0;
+  let minY = 1;
+  let maxY = 0;
+  for (const p of landmarks) {
+    if (p.x < minX) minX = p.x;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.y > maxY) maxY = p.y;
+  }
+  return { minX, maxX, minY, maxY };
+}
+
 function getBlendshapeScore(blendshapes, name) {
   const found = blendshapes.find(b => b.categoryName === name);
   return found ? found.score : 0;
+}
+
+function getBlendshapeAverage(blendshapes, names) {
+  let sum = 0;
+  let count = 0;
+  for (const n of names) {
+    const v = getBlendshapeScore(blendshapes, n);
+    if (v > 0) {
+      sum += v;
+      count++;
+    }
+  }
+  return count ? sum / count : 0;
 }
 
 function isHandNearMouth(handLandmarks, mouthCenter) {
@@ -98,6 +128,7 @@ function detectLoop() {
     }
 
     let serious = false;
+    let smiling = false;
     let handNearMouth = false;
 
     if (faceResult.faceLandmarks && faceResult.faceLandmarks.length > 0) {
@@ -111,7 +142,7 @@ function detectLoop() {
       }
 
       if (blendshapes) {
-        const mouthSmile = getBlendshapeScore(blendshapes, 'mouthSmile');
+        const mouthSmile = getBlendshapeAverage(blendshapes, ['mouthSmileLeft', 'mouthSmileRight']);
         const browDown =
           (getBlendshapeScore(blendshapes, 'browDownLeft') +
             getBlendshapeScore(blendshapes, 'browDownRight')) /
@@ -126,6 +157,7 @@ function detectLoop() {
           (browDown > BROW_DOWN_THRESHOLD || mouthFrown > MOUTH_FROWN_THRESHOLD)
         )
           serious = true;
+        if (mouthSmile > SMILE_HAPPY_THRESHOLD) smiling = true;
       } else if (landmarks[MOUTH_CENTER_TOP] && landmarks[MOUTH_LEFT]) {
         const cornerY = (landmarks[MOUTH_LEFT].y + landmarks[MOUTH_RIGHT].y) / 2;
         const topY = landmarks[MOUTH_CENTER_TOP].y;
@@ -134,15 +166,31 @@ function detectLoop() {
 
       if (mouthCenter && handResult.landmarks && handResult.landmarks.length > 0)
         handNearMouth = isHandNearMouth(handResult.landmarks, mouthCenter);
+
+      const box = getFaceBox(landmarks);
+      const ctx = overlay.getContext('2d');
+      ctx.clearRect(0, 0, overlay.width, overlay.height);
+      const x = box.minX * overlay.width;
+      const y = box.minY * overlay.height;
+      const w = (box.maxX - box.minX) * overlay.width;
+      const h = (box.maxY - box.minY) * overlay.height;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, w, h);
     }
 
     if (handNearMouth && memeMaoUrl) {
       showingMode = 'mao';
       showMeme(memeMaoUrl, 'Mão na boca');
+    } else if (smiling && memeSorrisoUrl) {
+      showingMode = 'sorriso';
+      showMeme(memeSorrisoUrl, 'Sorriso');
     } else if (serious && memeSeriaUrl) {
       showingMode = 'seria';
       showMeme(memeSeriaUrl, 'Cara séria');
     } else {
+      const ctx = overlay.getContext('2d');
+      ctx.clearRect(0, 0, overlay.width, overlay.height);
       showingMode = null;
       hideMeme();
     }
@@ -207,6 +255,11 @@ inputMemeSeria.addEventListener('change', function () {
 inputMemeMao.addEventListener('change', function () {
   const f = this.files[0];
   if (f) memeMaoUrl = URL.createObjectURL(f);
+});
+
+inputMemeSorriso.addEventListener('change', function () {
+  const f = this.files[0];
+  if (f) memeSorrisoUrl = URL.createObjectURL(f);
 });
 
 btnStart.addEventListener('click', startCamera);

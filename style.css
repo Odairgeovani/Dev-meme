@@ -26,7 +26,7 @@ h1 {
 .subtitle {
   text-align: center;
   color: #aaa;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   font-size: 0.95rem;
 }
 
@@ -34,7 +34,9 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-top: 0.75rem;
+  opacity: 0.8;
+  font-size: 0.8rem;
 }
 
 .upload-group {
@@ -45,7 +47,7 @@ h1 {
 .upload-group label {
   display: block;
   margin-bottom: 0.35rem;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .upload-group input[type="file"] {
@@ -55,7 +57,7 @@ h1 {
   border: 1px solid rgba(255,255,255,0.2);
   border-radius: 8px;
   color: #eee;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
 }
 
 .camera-area {

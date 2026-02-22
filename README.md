@@ -1,35 +1,44 @@
 # Meme por Gestos
 
-Aplicação web que usa a webcam para mostrar imagens conforme seus gestos:
+Aplicação web que usa a webcam para mostrar memes conforme seus gestos:
 
-- **Cara séria** → mostra a primeira imagem que você escolher (ex.: um meme)
-- **Mão na frente da boca** → mostra a segunda imagem que você escolher
+- **Cara séria/brava** → mostra o meme 1
+- **Sorriso** → mostra o meme 2
+- **Mão na frente da boca** → mostra o meme 3
+
+Enquanto você está sem expressão, só a câmera fica ligada com um quadrado branco futurista em volta do rosto.
 
 ## Como rodar
 
 A página precisa ser servida por um servidor (por segurança o navegador exige isso para câmera e para carregar o MediaPipe).
 
-Na pasta do projeto:
+Na pasta do projeto, você pode usar por exemplo:
 
 ```bash
-npx serve .
+python3 -m http.server 8080
 ```
 
-Depois abra no navegador o endereço que aparecer (ex.: `http://localhost:3000`).
+Depois abra no navegador: `http://localhost:8080/`.
 
 ## Como usar
 
-1. Escolha a **imagem para cara séria** (primeiro campo).
-2. Escolha a **imagem para mão na boca** (segundo campo).
-3. Clique em **Iniciar câmera** e permita o uso da webcam.
-4. Faça uma **cara séria** para ver a primeira imagem.
-5. Coloque a **mão na frente da boca** para ver a segunda imagem.
+1. Clique em **Iniciar câmera** e permita o uso da webcam.
+2. Abaixo da câmera, escolha:
+   - Imagem para **cara séria** (meme 1).
+   - Imagem para **sorriso** (meme 2).
+   - Imagem para **mão na boca** (meme 3).
+3. Volte para a área da câmera e faça:
+   - Uma **cara séria/brava** → aparece o meme 1.
+   - Um **sorriso bem evidente** → aparece o meme 2.
+   - Coloque a **mão na frente da boca** → aparece o meme 3.
+4. Sem expressão ou fora dos gestos → nenhuma imagem aparece, só o vídeo com o quadrado branco no rosto.
 
 ## Tecnologias
 
-- **MediaPipe Tasks Vision** (Face Landmarker + Hand Landmarker) para detecção de rosto e mãos.
-- **Face Blendshapes** para detectar “cara séria” (baixo valor de sorriso).
-- Proximidade da mão à região da boca para o gesto “mão na boca”.
+- **MediaPipe Tasks Vision**:
+  - Face Landmarker (landmarks + blendshapes) para detectar rosto, sorriso e cara séria.
+  - Hand Landmarker para detectar a mão e checar proximidade da boca.
+- Canvas HTML (`<canvas>`) para desenhar o quadrado branco em volta do rosto.
 
 ## Observações
 
